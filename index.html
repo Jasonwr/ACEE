@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>运维活动填报答疑手册</title>
+<style>
+  :root{
+    --primary:#3b6ef6;
+    --primary-dark:#2b55d0;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e5e9f2;
+    --mark:#fff2a8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:linear-gradient(180deg,#eef3ff 0%,#f7f9fc 360px,#f7f9fc 100%);
+    color:var(--text);
+    line-height:1.7;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- 顶部 ---------- */
+  .hero{
+    padding:56px 20px 28px;
+    text-align:center;
+  }
+  .hero h1{
+    margin:0 0 8px;
+    font-size:30px;
+    letter-spacing:.5px;
+  }
+  .hero .sub{
+    margin:0 0 26px;
+    color:var(--muted);
+    font-size:15px;
+  }
+
+  /* 搜索框 */
+  .searchbox{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    max-width:720px;
+    margin:0 auto;
+    padding:8px 10px 8px 20px;
+    background:#fff;
+    border:2px solid transparent;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(37,66,140,.10);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .searchbox:focus-within{
+    border-color:var(--primary);
+    box-shadow:0 12px 34px rgba(59,110,246,.22);
+  }
+  .searchbox .icon{
+    width:22px;height:22px;flex:none;
+    color:#94a3b8;
+  }
+  .searchbox input{
+    flex:1;
+    min-width:0;
+    border:0;
+    outline:0;
+    background:transparent;
+    font-size:16px;
+    padding:12px 0;
+    color:var(--text);
+    font-family:inherit;
+  }
+  .searchbox input::placeholder{color:#a9b4c6;}
+  input[type=search]::-webkit-search-cancel-button{display:none;}
+  .clear-btn{
+    flex:none;
+    width:30px;height:30px;
+    border:0;border-radius:50%;
+    background:#eef2f9;
+    color:#7b8798;
+    font-size:14px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .clear-btn:hover{background:#e0e7f5;color:#475569;}
+
+  /* 快捷标签（最多 5 个） */
+  .quick{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    max-width:760px;
+    margin:18px auto 0;
+    min-height:30px;
+  }
+  .quick .chip{
+    padding:5px 13px;
+    font-size:13px;
+    color:#4763a8;
+    background:#e8eeff;
+    border-radius:20px;
+    cursor:pointer;
+    user-select:none;
+    transition:.15s;
+  }
+  .quick .chip:hover{background:#d7e2ff;color:var(--primary-dark);}
+
+  /* ---------- 结果区 ---------- */
+  .container{
+    max-width:820px;
+    margin:0 auto;
+    padding:8px 20px 60px;
+  }
+  .count{
+    font-size:13px;
+    color:var(--muted);
+    padding:6px 4px 14px;
+  }
+
+  /* 展开 / 收起全部按钮 */
+  .toggle-wrap{
+    text-align:center;
+    padding:6px 0 18px;
+  }
+  .toggle-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:11px 26px;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--primary-dark);
+    background:#fff;
+    border:1.5px solid #cfdcff;
+    border-radius:999px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:.18s;
+    box-shadow:0 3px 10px rgba(59,110,246,.08);
+  }
+  .toggle-btn:hover{
+    background:#f4f7ff;
+    border-color:var(--primary);
+    box-shadow:0 6px 18px rgba(59,110,246,.18);
+    transform:translateY(-1px);
+  }
+  .toggle-btn .arrow{
+    display:inline-block;
+    font-size:11px;
+    color:#94a3b8;
+    transition:transform .2s;
+  }
+  .toggle-btn.open .arrow{transform:rotate(90deg);}
+  .toggle-btn.open .label::before{content:"";}
+  .toggle-btn .label{white-space:nowrap;}
+
+  /* 问答卡片：默认全部折叠 */
+  .item{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    margin-bottom:12px;
+    overflow:hidden;
+    transition:border-color .18s, box-shadow .18s;
+  }
+  .item:hover{
+    border-color:#c7d6ff;
+    box-shadow:0 6px 20px rgba(37,66,140,.08);
+  }
+  .item summary{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:16px 20px;
+    font-size:16px;
+    font-weight:600;
+    color:#172033;
+    cursor:pointer;
+    list-style:none;
+    outline:none;
+  }
+  .item summary::-webkit-details-marker{display:none;}
+  .item summary::marker{content:"";}
+  .chev{
+    flex:none;
+    width:9px;height:9px;
+    margin-left:auto;
+    border-right:2px solid #94a3b8;
+    border-bottom:2px solid #94a3b8;
+    transform:rotate(45deg) translateY(-2px);
+    transition:transform .2s;
+  }
+  .item[open] .chev{transform:rotate(-135deg) translateY(-2px);}
+
+  .answer{
+    margin:0 20px;
+    padding:14px 0 18px;
+    border-top:1px dashed #eaeef6;
+    font-size:15px;
+    color:#3d4a5c;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:0 20px 16px;
+  }
+  .tag{
+    font-size:12px;
+    color:#6b7fa8;
+    background:#f2f5fb;
+    padding:2px 9px;
+    border-radius:10px;
+  }
+
+  mark{
+    background:var(--mark);
+    color:inherit;
+    padding:0 2px;
+    border-radius:3px;
+  }
+
+  /* 空状态 */
+  .empty{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--muted);
+  }
+  .empty .big{font-size:40px;margin-bottom:12px;}
+  .empty p{margin:6px 0;}
+  .empty .hint{font-size:13px;color:#94a3b8;}
+
+  .footer{
+    text-align:center;
+    font-size:12.5px;
+    color:#9aa6b8;
+    padding:0 20px 40px;
+  }
+
+  @media (max-width:600px){
+    .hero{padding:36px 16px 22px;}
+    .hero h1{font-size:23px;}
+    .searchbox{padding:6px 8px 6px 14px;border-radius:13px;}
+    .searchbox input{font-size:15px;}
+    .container{padding:8px 14px 50px;}
+    .item summary{padding:14px 16px;font-size:15px;}
+    .answer{margin:0 16px;font-size:14.5px;}
+    .tags{padding:0 16px 14px;}
+    .toggle-btn{padding:10px 20px;font-size:13.5px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>📘 运维活动填报答疑手册</h1>
+  <h2>生态环境监测管理服务平台-污染源自行监测监管(自动监测)系统</h2>
+
+  <div class="searchbox">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M16.6 16.6 21 21"></path>
+    </svg>
+    <input id="searchInput" type="search" autocomplete="off" spellcheck="false"
+           placeholder="试试搜索：密码 / 绑定 / 缺失 …">
+    <button id="clearBtn" class="clear-btn" title="清空" hidden>✕</button>
+  </div>
+
+  <!-- 只显示前 5 个高频关键词 -->
+  <div class="quick" id="quick"></div>
+</header>
+
+<main class="container">
+  <!-- ★ 展开 / 收起全部问答 -->
+  <div class="toggle-wrap" id="toggleWrap">
+    <button class="toggle-btn" id="toggleBtn">
+      <span class="arrow">▸</span>
+      <span class="label" id="toggleLabel">浏览全部问答</span>
+    </button>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div id="results"></div>
+</main>
+
+<footer class="footer">
+  共收录 <span id="total">0</span> 条问答 · 内容以最新版手册为准
+</footer>
+
+<script>
+/* =========================================================
+   ① 数据区：把 Word 手册的内容填到这里
+   格式：{ q: "问题", tags: ["关键词1","关键词2"], a: "答案" }
+   —— 答案里的换行用 \n 表示
+   ========================================================= */
+const FAQ_DATA = [
+  {
+    q: "运维PC端从哪里登录？",
+    tags: ["登录"],
+    a: "打开浏览器访问地址：https://jkzx.envsc.cn/ops-provider-filing/#/login。"
+  },
+  {
+    q: "第一次登录运维系统，账号是什么？有初始密码吗？",
+    tags: ["账号", "初始密码"],
+    a: "运维端账号并非单独注册生成。全国技术服务机构备案信息中的“运维机构备案负责人手机号”即运维端的唯一初始登录账号，未进行备案无法登录。\n\n使用备案负责人手机号首次登录时，须先关注“污染源监控”公众号并完成账号绑定后方可登录，登录后可在系统内设置登录密码。"
+  },
+  {
+    q: "如何查看运维机构备案运维负责人？",
+    tags: ["备案", "负责人"],
+    a: "打开浏览器访问平台地址：https://batb.cnemc.cn:8081/?province=0#/home/informationQuery，在运维机构中输入机构名称查看。"
+  },
+  {
+    q: "公众号绑定后登录运维端失败怎么处理？",
+    tags: ["公众号", "运维端失败", "绑定"],
+    a: "查看污染源监控公众号绑定的是否为企业端账户（企业端账户公众号左下功能栏有“自动监控”），若绑定的为企业端账户，则按下列步骤操作：\n" +
+        "1.联系排污单位在企业端删除该账户\n" +
+        "2.取消关注污染源监控公众号\n" +
+        "3.重新关注污染源监控公众号\n" +
+        "4.重新绑定账户."
+  },
+  {
+    q: "输入手机号后提示无法登录，是什么原因？",
+    tags: ["手机号", "无法登录"],
+    a: "按以下顺序排查：\n" +
+        "1.该机构是否已完成全国技术服务机构备案——未备案无法登录；\n" +
+        "2.是否已关注“污染源监控”公众号并完成账号绑定；\n" +
+        "3.使用的手机号是否为备案负责人手机号（其他人员手机号不能作为初始登录账号）；\n" +
+        "4.若为运维人员账号，确认是否已由备案负责人开通运维账号。"
+  },
+  {
+    q: "密码忘记了怎么办？",
+    tags: ["忘记密码"],
+    a: "系统以微信公众号扫码为主要登录方式。可先用已绑定公众号的微信重新扫码登录，再在系统内重新设置密码。\n" +
+        "若扫码仍无法登录，请核对备案手机号是否发生变更，必要时联系系统运维人员核实备案信息。"
+  },
+  {
+    q: "公众号怎么绑定？备案负责人和运维人员的绑定方式一样吗？",
+    tags: ["绑定","负责人","运维人员","公众号"],
+    a: "绑定方式一致，区别仅在手机号归属：\n" +
+        "1.微信搜索并关注公众号“污染源监控”；\n" +
+        "2.进入公众号，找到账号绑定入口；\n" +
+        "3.输入本人手机号（备案负责人用备案负责人手机号，运维人员用登记的手机号），点击【获取验证码】；\n" +
+        "4.输入验证码，点击【提交】，完成公众号账号绑定。"
+  },
+  {
+    q: "扫码后公众号提示系统维护中，扫码登录暂时无法为您提供服务，请使用账号密码登录!",
+    tags: ["登录","公众号","维护","账号","密码"],
+    a: "更换浏览器重新登录，推荐谷歌、edge浏览器。"
+  },
+  {
+    q: "如何给运维人员开通账号？（公众号绑定时出现：当前手机号码未查询到账户信息，请联系管理员添加账户。）",
+    tags: ["开通账号","运维人员"],
+    a: "操作路径如下：\n" +
+            "1.左侧菜单栏进入【机构档案】；\n" +
+            "2.切换至技术人员页；\n" +
+            "3.在人员列表中选中需开通账号的运维人员，点击【开通运维账号】；\n" +
+            "4.输入该运维人员手机号，核对信息无误后点击【确定】，账号开通完成。"
+  },
+  {
+    q: "如何让运维人员有账号登录运维PC端？（运维人员扫码登录PC端失败）",
+    tags: ["运维PC端","扫码登录"],
+    a: "操作路径如下：\n" +
+            "1.备案负责人登录系统；\n" +
+            "2.左侧菜单栏进入【账户管理】→【角色管理】；\n" +
+            "3.点击【新增】，输入角色名称（如“运维管理员”“普通运维员”）；\n" +
+            "4.在操作列点击【功能授权】，在功能授权列表中勾选该角色需开放的系统权限（如点位管理、人员管理、数据查看等），点击保存。"
+  },
+  {
+    q: "给角色授权时应该勾哪些权限？",
+    tags: ["角色授权"],
+    a: "按岗位职责最小化授权。建议区分“运维管理员”与“普通运维员”两类角色：\n管理员保留人员管理、点位管理等权限；现场运维人员原则上只开放其履职必需的权限。\n授权范围应严格限定在备案且具备资质的人员范围内。"
+  },
+  {
+    q: "系统人员列表里找不到某位运维人员，怎么处理？",
+    tags: ["运维人员"],
+    a: "运维账号开通范围被严格限定——仅限备案且具备资质的运维人员，并须绑定公众号后方可操作。\n人员列表中的人员来自全国技术服务机构备案信息中的“在职技术人员”。\n若列表中无该人员，应先完善备案信息，待人员信息同步后再开通账号。"
+  },
+  {
+    q: "账号已开通，但运维人员登录不了，怎么办？",
+    tags: ["登录","运维人员"],
+    a: "依次核对：\n" +
+            "1.该人员是否已用登记的同一手机号关注并绑定“污染源监控”公众号；\n" +
+            "2.开通账号时录入的手机号是否与本人实际使用号码一致；\n" +
+            "3.账号是否已确认开通成功；\n" +
+            "4.该人员是否已被分配至相应运维点位（涉及具体运维任务时）。"
+  },
+  {
+    q: "如何为监测点分配运维人员？",
+    tags: ["监测点","分配","运维人员"],
+    a: "操作路径如下：\n" +
+            "1.登录系统后，从左侧菜单栏进入【运维点位】；\n" +
+            "2.在点位列表中选中需配置的监测点；\n" +
+            "3.点击“运维人员”列的缺失或编辑按钮；\n" +
+            "4.从人员列表中选择人员，点击确定。\n" +
+            "支持按运维点位分别选择对应的运维人员。"
+  },
+  {
+    q: "运维任务需要运维机构手动派单吗？",
+    tags: ["运维任务","派单"],
+    a: "不需要。\n运维任务由系统依据运维计划自动生成，运维人员在公众号【现场端运维】中选择对应任务执行。\n运维机构侧的重点工作是“分配合适的人员到点位”和“跟踪执行情况”。"
+  },
+  {
+    q: "运维计划由谁制定？运维机构能修改吗？",
+    tags: ["运维计划","修改"],
+    a: "运维计划由排污单位在企业端完善。\n系统已按照 HJ 75、HJ 76、HJ 355、HJ 354 规范内设运维计划，仅限排污单位从严调整；企业端维护计划时，运维周期只能比标准规范更严格。\n运维机构作为执行方，应按已生效的运维计划组织现场作业。\n如遇假期可按以下案例操作（运维周期是7天，上次在9月29日维护，可在10月1日再次维护，下次维护日期即为10月8日。）"
+  },
+  {
+    q: "运维机构如何掌握运维人员的执行情况？",
+    tags: ["运维人员","执行情况"],
+    a: "运维端可查询运维活动和运维点位信息。\n运维内容提交后须经运维负责人确认、排污单位确认；确认不通过的会退回至具体实施的运维人员重新签字提交，相关记录在系统内可查。"
+  },
+  {
+    q: "运维负责人和运维人员可以是同一人吗？",
+    tags: ["运维人员","运维负责人"],
+    a: "可以兼任。\n系统规则明确“运维人员及运维负责人均可提交运维内容”，流程中会判断提交人是否为运维负责人并进入相应确认环节，最终仍需完成排污单位确认。\n运维负责人兼任运维人员时，须在“子账户管理”处添加账号信息。"
+  },
+  {
+    q: "运维计划维护后什么时候生成运维任务？",
+    tags: ["运维计划","生成运维任务"],
+    a: "运维计划首次维护后会在次日0点生成运维任务。"
+  },
+  {
+    q: "运维人员从哪里开展运维活动？",
+    tags: ["运维人员","开展运维活动"],
+    a: "通过微信公众号“污染源监控”→菜单【现场端运维】开展各类运维活动。"
+  },
+  {
+    q: "第一次使用公众号开展运维需要做什么？",
+    tags: ["公众号","开展运维"],
+    a: "需完成两件事：\n" +
+            "1.微信搜索并关注公众号“污染源监控”，完成账号绑定；\n" +
+            "2.首次进入【现场端运维】菜单时，系统会自动弹出签署承诺书页面，完成运维承诺书签署。"
+  },
+  {
+    q: "承诺书每次运维都要签吗？",
+    tags: ["承诺书"],
+    a: "不需要。\n承诺书在登录公众号后仅签名一次；但运维内容每次提交前均需要电子签名。"
+  },
+  {
+    q: "运维任务从哪里查看？",
+    tags: ["运维任务","查看"],
+    a: "进入公众号【现场端运维】，选择系统依据运维计划自动生成的运维任务，依规开展现场执行操作。"
+  },
+  {
+    q: "遇到突发情况怎么发起运维？",
+    tags: ["运维","突发"],
+    a: "在公众号【现场端运维】中点击【发起突发运维活动】按钮，选定对应的活动类型，即可开启具体的运维工作。"
+  },
+  {
+    q: "打卡有什么要求？",
+    tags: ["打卡"],
+    a: "两个要点：\n" +
+            "1.时限：运维人员须在12小时内完成打卡；\n" +
+            "2.范围：距离监测站房1公里范围内，系统提醒“在范围内打卡”；1公里范围外，系统提醒“在范围外打卡”。"
+  },
+  {
+    q: "运维内容提交后，还要经过哪些环节",
+    tags: ["运维流程"],
+    a: "提交后的流转顺序为：运维内容提交（含电子签名）→运维负责人确认→排污单位确认，通过则本次运维结束。"
+  },
+  {
+    q: "提交的内容被确认不通过怎么办",
+    tags: ["运维任务","不通过"],
+    a: "若运维负责人或排污单位对提交的运维内容确认不通过，将退回至具体实施的运维人员，需重新签字提交。\n请根据退回意见补充或更正现场信息后重新提交。"
+  },
+  {
+    q: "运维人员可以用PC端吗？",
+    tags: ["运维人员","PC端"],
+    a: "可以。\n使用已绑定公众号的微信扫码登录运维端PC，可查看运维活动、运维点位等信息；首次扫码登录后，可在系统内修改密码。"
+  },
+  {
+    q: "系统里看不到运维任务？",
+    tags: ["运维任务","看不到"],
+    a: "请按以下顺序确认：\n" +
+            "1.公众号是否已完成绑定；\n" +
+            "2.账号是否已由备案负责人开通；\n" +
+            "3.是否已被分配至相应运维点位（点位未分配人员则无法看到对应任务）；\n" +
+            "4.该点位的运维计划是否已由排污单位维护生效。"
+  },
+  {
+    q: "计划生效日期无法更改",
+    tags: ["计划生效日期","更改"],
+    a: "首次维护监测点运维计划时可选择计划生效日期，计划保存后不得修改。"
+  },
+  {
+    q: "现场流量计为管道流量计，无需开展实际水样比对",
+    tags: ["管道流量计","水样比对"],
+    a: "电磁流量计的周期问题，目前只能填到90天。"
+  },
+  {
+    q: "运维计划中多出现或少出现监测项目如何解决？",
+    tags: ["监测项目","多","少"],
+    a: "目前运维计划中的监测项目根据“重点污染源自动监测监控系统V5.0【企业服务端】”中对应监测点的监测项目生成，若存在监测项目新增或缺失，则需联系当地生态环境局国发平台管理人员进行处理。"
+  },
+  {
+    q: "运维任务中缺少自动监测设备？",
+    tags: ["自动监测设备","缺少"],
+    a: "目前运维任务中的监测项目根据“重点污染源自动监测监控系统V5.0【企业服务端】”中对应监测点的自动监测设备生成，若存在监测设备缺失，则排污单位需在企业端添加设备信息。"
+  },
+  {
+    q: "排污单位标记“故障”后，运维人员要做什么？",
+    tags: ["故障","标记","运维人员"],
+    a: "排污单位标记“故障”后，系统会推送“设备检修”运维任务，运维人员据此开展现场检修并完成填报。"
+  },
+  {
+    q: "企业端怎么维护运维计划？",
+    tags: ["维护","运维计划","企业"],
+    a: "在列表中选择需要维护计划的监测点记录→点击“运维计划”列的【缺失】→系统根据 HJ 75 和 HJ 355 协议给出默认的计划周期→修改运维周期（仅能比标准规范严格）→点击【确定】。维护成功后需要修改时，点击编辑按钮进行修改。"
+  },
+  {
+    q: "打卡时提示“在范围外打卡”，是否需要重新打卡？",
+    tags: ["打卡","范围外"],
+    a: "先核对定位是否准确、是否已进入监测站房1公里范围内。\n" +
+            "若确在范围内仍提示范围外，该问题为系统预设经纬度与排口经纬度不一致导致，可直接开展运维活动；若确实在范围外，按实际情况继续操作并如实说明。\n" +
+            "系统提示仅为位置判定结果，不作为可以虚假填报的理由。"
+  },
+  {
+    q: "提交时提示需要电子签名，怎么处理？",
+    tags: ["电子签名"],
+    a: "运维内容每次提交前均需要电子签名，请按页面提示完成签名后再提交。\n" +
+            "注意：承诺书签名仅在关注公众号后第一次使用时执行一次，与运维内容的每次电子签名是两回事。"
+  },
+  {
+    q: "找不到运维任务/任务未按时产生？",
+    tags: ["运维任务","未产生"],
+    a: "先确认该点位运维计划是否已由排污单位维护生效、是否已为该点位分配运维人员。\n运维任务是系统依据运维计划自动生成的，计划未生效或人员未分配都会导致任务缺失。\n以上均正常仍无任务时，请联系运维机构或系统运维人员核查。"
+  },
+];
+/* ===================== 数据区结束 ===================== */
+
+
+/* ---------- 工具函数 ---------- */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+function escapeRegExp(s){
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+/* 中文按二元切分 + 英文数字按词切分 */
+function tokenize(text){
+  const t = String(text).toLowerCase();
+  const tokens = [];
+  (t.match(/[a-z0-9]+/g) || []).forEach(x => tokens.push(x));
+  const cjk = t.replace(/[^\u4e00-\u9fa5]/g, '');
+  if (cjk.length === 1) tokens.push(cjk);
+  for (let i = 0; i < cjk.length - 1; i++) tokens.push(cjk.slice(i, i + 2));
+  return [...new Set(tokens)];
+}
+
+/* ---------- 搜索打分 ---------- */
+function search(rawQuery){
+  const q = String(rawQuery).trim().toLowerCase();
+  if (!q) {
+    return FAQ_DATA.map((item, i) => ({ item, idx: i, score: 0 }));
+  }
+  const tokens = tokenize(q);
+  const out = [];
+
+  FAQ_DATA.forEach((item, i) => {
+    const question = (item.q || '').toLowerCase();
+    const tags     = (item.tags || []).join(' ').toLowerCase();
+    const answer   = (item.a || '').toLowerCase();
+    let score = 0;
+
+    if (question.includes(q)) score += 150;
+    if (tags.includes(q))     score += 100;
+    if (answer.includes(q))   score += 40;
+
+    let hit = 0;
+    tokens.forEach(tk => {
+      let s = 0;
+      if (question.includes(tk)) s += 12;
+      if (tags.includes(tk))     s += 16;
+      if (answer.includes(tk))   s += 4;
+      if (s > 0) { hit++; score += s; }
+    });
+
+    if (tokens.length) score += (hit / tokens.length) * 50;
+
+    if (score > 0) out.push({ item, idx: i, score });
+  });
+
+  out.sort((a, b) => b.score - a.score || a.idx - b.idx);
+  return out;
+}
+
+/* ---------- 关键词高亮 ---------- */
+function highlight(text, tokens){
+  const safe = escapeHtml(text);
+  if (!tokens || !tokens.length) return safe;
+  const list = [...new Set(tokens)]
+    .filter(t => t && t.length)
+    .sort((a, b) => b.length - a.length);
+  if (!list.length) return safe;
+  try {
+    const pattern = list.map(t => escapeRegExp(escapeHtml(t))).join('|');
+    return safe.replace(new RegExp('(' + pattern + ')', 'gi'), '<mark>$1</mark>');
+  } catch (e) {
+    return safe;
+  }
+}
+
+/* ---------- DOM 引用 ---------- */
+const inputEl    = document.getElementById('searchInput');
+const clearBtn   = document.getElementById('clearBtn');
+const resultsEl  = document.getElementById('results');
+const countEl    = document.getElementById('count');
+const toggleWrap = document.getElementById('toggleWrap');
+const toggleBtn  = document.getElementById('toggleBtn');
+const toggleLabel= document.getElementById('toggleLabel');
+
+/* ★ 核心状态：是否已手动展开全部问答 */
+let showAll = false;
+
+/* ---------- 渲染单张卡片 ---------- */
+function cardHtml(r, tokens){
+  const tags = (r.item.tags && r.item.tags.length)
+    ? '<div class="tags">' + r.item.tags.map(t =>
+        '<span class="tag">' + escapeHtml(t) + '</span>').join('') + '</div>'
+    : '';
+  return '' +
+    '<details class="item">' +
+      '<summary>' +
+        '<span>' + highlight(r.item.q, tokens) + '</span>' +
+        '<span class="chev"></span>' +
+      '</summary>' +
+      '<div class="answer">' + highlight(r.item.a, tokens) + '</div>' +
+      tags +
+    '</details>';
+}
+
+/* ---------- 主渲染 ---------- */
+function render(){
+  const raw = inputEl.value.trim();
+  const searching = raw.length > 0;
+  const list = search(raw);
+  const tokens = raw ? [...tokenize(raw), raw.toLowerCase()] : [];
+
+  clearBtn.hidden = !raw;
+
+  /* ------ 搜索模式 ------ */
+  if (searching){
+    toggleWrap.style.display = 'none';      // 搜索时隐藏「展开全部」按钮
+
+    if (!list.length){
+      countEl.textContent = '';
+      resultsEl.innerHTML =
+        '<div class="empty">' +
+          '<div class="big">🔍</div>' +
+          '<p>没有找到与「<b>' + escapeHtml(raw) + '</b>」相关的内容</p>' +
+          '<p class="hint">试试换个说法，或只输入核心词，例如「密码」「绑定」「缺失」</p>' +
+        '</div>';
+      return;
+    }
+
+    countEl.textContent = '找到 ' + list.length + ' 条相关问答';
+    resultsEl.innerHTML = list.map(r => cardHtml(r, tokens)).join('');
+    return;
+  }
+
+  /* ------ 非搜索模式 ------ */
+  toggleWrap.style.display = '';
+
+  if (showAll){
+    /* 已展开：显示全部卡片 + 按钮变成「收起」 */
+    toggleBtn.classList.add('open');
+    toggleLabel.textContent = '收起全部问答';
+    countEl.textContent = '共 ' + FAQ_DATA.length + ' 条问答';
+    resultsEl.innerHTML = list.map(r => cardHtml(r, tokens)).join('');
+  } else {
+    /* 默认折叠：不显示任何卡片，只留按钮 */
+    toggleBtn.classList.remove('open');
+    toggleLabel.textContent = '浏览全部问答（共 ' + FAQ_DATA.length + ' 条）';
+    countEl.textContent = '';
+    resultsEl.innerHTML = '';
+  }
+}
+
+/* ---------- 事件绑定 ---------- */
+let timer = null;
+inputEl.addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(render, 120);   // 输入防抖
+});
+
+clearBtn.addEventListener('click', () => {
+  inputEl.value = '';
+  inputEl.focus();
+  render();
+});
+
+inputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { clearTimeout(timer); render(); }
+  if (e.key === 'Escape') { inputEl.value = ''; render(); }
+});
+
+/* Ctrl / Cmd + K 聚焦搜索框 */
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    inputEl.focus();
+    inputEl.select();
+  }
+});
+
+/* ★ 展开 / 收起全部问答 */
+toggleBtn.addEventListener('click', () => {
+  showAll = !showAll;
+  render();
+  // 展开后平滑滚动到列表顶部，方便浏览
+  if (showAll) {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 50);
+  }
+});
+
+/* ---------- 快捷标签：取前 5 个高频词 ---------- */
+(function initQuick(){
+  const quickEl = document.getElementById('quick');
+  const MAX_CHIPS = 5;               // ← 只显示前 5 个
+
+  const freq  = new Map();
+  const order = new Map();
+  let seq = 0;
+
+  FAQ_DATA.forEach(item => {
+    (item.tags || []).forEach(rawTag => {
+      const k = String(rawTag).trim();
+      if (!k) return;
+      freq.set(k, (freq.get(k) || 0) + 1);
+      if (!order.has(k)) order.set(k, seq++);
+    });
+  });
+
+  const picked = [...freq.keys()]
+    .sort((a, b) =>
+      (freq.get(b) - freq.get(a)) ||      // 出现次数高的优先
+      (order.get(a) - order.get(b))       // 次数相同按出现顺序
+    )
+    .slice(0, MAX_CHIPS);
+
+  quickEl.innerHTML = picked.map(t =>
+    '<span class="chip" data-kw="' + escapeHtml(t) + '">' + escapeHtml(t) + '</span>'
+  ).join('');
+
+  quickEl.addEventListener('click', e => {
+    const kw = e.target.dataset.kw;
+    if (!kw) return;
+    inputEl.value = kw;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+/* ---------- 初始化 ---------- */
+document.getElementById('total').textContent = FAQ_DATA.length;
+render();
+</script>
+</body>
+</html>
